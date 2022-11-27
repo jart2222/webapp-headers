@@ -13,14 +13,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
-@WebServlet("buscar-producto")
+@WebServlet("/buscar-producto")
 public class BuscarProductoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ProductoService service=new ProductoServiceImpl();
         String nombre= req.getParameter("producto");
 
-        Optional<Producto> encontrado= service.listar().stream().filter(p->p.getNombre().contains(nombre)).findFirst();
+        Optional<Producto> encontrado= service.listar().stream().filter(p-> {
+            if (nombre==null || nombre.isBlank()) {
+            return false;
+            }
+
+            return p.getNombre().contains(nombre);
+        }).findFirst();
 
         if (encontrado.isPresent()){
             resp.setContentType("text/html;charset=UTF-8");
